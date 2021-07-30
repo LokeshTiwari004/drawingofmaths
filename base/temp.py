@@ -1,51 +1,32 @@
-# Python program to explain
-# cv2.polylines() method
+from dom import *
 
-import cv2
-import numpy as np
+fh = Handle_frames()
+mm = MovieMaker(fh.name, fh.frame_sequence, movie_name='third', framerate=30)
 
-# path
-path = r'gfg.png'
+screen = Canvas()
+screen.createcp()
 
-# Reading an image in default
-# mode
-image = cv2.imread(path)
+center1 = carsys3D(screen)
 
-# Window name in which image is
-# displayed
-window_name = 'Image'
+center1.drawgrid(which='main', skip_factor=(6, 6, 6), zxc=(80, 80, 8), lw=1, xy=False, yz=False)
+center1.drawaxis(which='main', xc=(180, 180, 180), yc=(180, 180, 180), zc=(180, 180, 180), lw=2)
 
-# Polygon corner points coordinates
-pts = np.array([[25, 70], [25, 145],
-                [75, 190], [150, 190],
-                [200, 145], [200, 70],
-                [150, 25], [75, 25]],
-               np.int32)
 
-print(pts)
-pts = pts.reshape((-1, 1, 2))
-print(pts)
+t = np.linspace(0, 800*np.pi/399, 400)
+radius = 30
 
-isClosed = True
+i = 0
+while i < 200:
 
-# Green color in BGR
-color = (200, 200, 0)
+    x = radius * np.sin(t[i]) * np.cos(t)
+    y = radius * np.sin(t[i]) * np.sin(t)
+    z = [radius * np.cos(t[i])]*400
 
-# Line thickness of 8 px
-thickness = 1
+    center1.drawit(which='main', array=center1.truepos(x, y, z), color=(200, 200, 0), thickness=1)
+    # center1.drawit(which='main', array=center1.truepos(x, z, y), color=(66, 147, 168), thickness=1)
+    screen.savesc(fh.current_dir + '\\' + fh.name + '\\' + fh.nameit())
 
-# Using cv2.polylines() method
-# Draw a Green polygon with
-# thickness of 1 px
-image = cv2.polylines(image, [pts],
-                      isClosed, color,
-                      thickness)
+    i += 1
 
-# Displaying the image
-while (1):
-
-    cv2.imshow('image', image)
-    if cv2.waitKey(20) & 0xFF == 27:
-        break
-
-cv2.destroyAllWindows()
+mm.make_movie()
+fh.del_img_seq()

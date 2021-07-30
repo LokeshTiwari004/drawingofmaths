@@ -91,33 +91,25 @@ class carsys2D:  # full form is cartesian System 2 dimensional
             RuntimeError('please specify array of points')
 
     def drawaxis(self, which='main', color=(200, 200, 0), lw=2):
-        if which == 'main':
-            self.drawit(array=self.truepos([min(self.bv1bound), max(self.bv1bound)], [0, 0]), color=color, thickness=lw)
-            self.drawit(array=self.truepos([0, 0], [min(self.bv2bound), max(self.bv2bound)]), color=color, thickness=lw)
-        elif which == 'clone':
-            self.drawit(which='clone', array=self.truepos([min(self.bv1bound), max(self.bv1bound)], [0, 0]), color=color, thickness=lw)
-            self.drawit(which='clone', array=self.truepos([0, 0], [min(self.bv2bound), max(self.bv2bound)]), color=color, thickness=lw)
+        if which == 'main' or which == 'clone':
+            self.drawit(which=which, array=self.truepos([min(self.bv1bound), max(self.bv1bound)], [0, 0]),
+                        color=color, thickness=lw)
+            self.drawit(which=which, array=self.truepos([0, 0], [min(self.bv2bound), max(self.bv2bound)]),
+                        color=color, thickness=lw)
         else:
             NameError(f'{which} not found')
 
     def drawgrid(self, skip_factor=(1, 1), which='main', color=(200, 200, 200), lw=1):
-        if which == 'main':
+        if which == 'main' or which == 'clone':
             val = np.array([0, 0])
             updw = [min(self.bv2bound), max(self.bv2bound)]
             lfrg = [min(self.bv1bound), max(self.bv1bound)]
             for g in range(0, int(max(self.bv1bound)), skip_factor[0]):
-                self.drawit(array=self.truepos(val + np.array([g, g]), updw), color=color, thickness=lw)
-                self.drawit(array=self.truepos(val - np.array([g, g]), updw), color=color, thickness=lw)
+                self.drawit(which=which, array=self.truepos(val + np.array([g, g]), updw), color=color,
+                            thickness=lw)
+                self.drawit(which=which,array=self.truepos(val - np.array([g, g]), updw), color=color, thickness=lw)
             for g in range(0, int(max(self.bv2bound)), skip_factor[1]):
-                self.drawit(array=self.truepos(lfrg, val + np.array([g, g])), color=color, thickness=lw)
-                self.drawit(array=self.truepos(lfrg, val - np.array([g, g])), color=color, thickness=lw)
-        if which == 'clone':
-            val = np.array([0, 0])
-            updw = [min(self.bv2bound), max(self.bv2bound)]
-            lfrg = [min(self.bv1bound), max(self.bv1bound)]
-            for g in range(0, int(max(self.bv1bound)), skip_factor[0]):
-                self.drawit(which='clone', array=self.truepos(val + np.array([g, g]), updw), color=color, thickness=lw)
-                self.drawit(which='clone', array=self.truepos(val + np.array([g, g]), updw), color=color, thickness=lw)
-            for g in range(0, int(max(self.bv2bound)), skip_factor[1]):
-                self.drawit(which='clone', array=self.truepos(lfrg, val + np.array([g, g])), color=color, thickness=lw)
-                self.drawit(which='clone', array=self.truepos(lfrg, val + np.array([g, g])), color=color, thickness=lw)
+                self.drawit(which=which, array=self.truepos(lfrg, val + np.array([g, g])), color=color, thickness=lw)
+                self.drawit(which=which, array=self.truepos(lfrg, val - np.array([g, g])), color=color, thickness=lw)
+        else:
+            NameError(f'{which} not found')
