@@ -31,9 +31,9 @@ class Col_man:  # color manager
 
         self.color = self.b, self.g, self.r
 
-        self.range_b = min(start[0],stop[0]),max(start[0],stop[0])
-        self.range_g = min(start[1],stop[1]),max(start[1],stop[1])
-        self.range_r = min(start[2],stop[2]),max(start[2],stop[2])
+        self.range_b = min(start[0], stop[0]), max(start[0], stop[0])
+        self.range_g = min(start[1], stop[1]), max(start[1], stop[1])
+        self.range_r = min(start[2], stop[2]), max(start[2], stop[2])
 
         for i in range(steps):
 
