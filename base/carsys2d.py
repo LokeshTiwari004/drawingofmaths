@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from base.colormanager import Col_man
 
 
 # this class gives us a cartesian 2-dimensional system
@@ -25,7 +26,7 @@ class carsys2D:  # full form is cartesian System 2 dimensional
         self.bv1bound = range(-98, 99)
         self.bv2bound = range(-53, 54)
 
-    def truepos(self, arr, y=None):  # full form of this function name is true position
+    def truepos(self, arr, y=None, bindit=False):  # full form of this function name is true position
 
         """ this function does scaling and provides true position on screen of points
             this takes input as an two dimensional array of co-ordinates
@@ -37,11 +38,12 @@ class carsys2D:  # full form is cartesian System 2 dimensional
 
         if len(arr.shape) == 1 and y is not None:
             if len(arr) == len(y):
-                arr = arr[arr > min(self.bv1bound) - 1]
-                arr = arr[arr < max(self.bv1bound) + 1]
+                if bindit:
+                    arr = arr[arr > min(self.bv1bound) - 1]
+                    arr = arr[arr < max(self.bv1bound) + 1]
 
-                y = y[y > min(self.bv1bound) - 1]
-                y = y[y < max(self.bv1bound) + 1]
+                    y = y[y > min(self.bv1bound) - 1]
+                    y = y[y < max(self.bv1bound) + 1]
 
                 answer = np.array([self.center + arr[0] * self.bv1 + y[0] * self.bv2])
 
@@ -90,6 +92,24 @@ class carsys2D:  # full form is cartesian System 2 dimensional
         else:
             RuntimeError('please specify array of points')
 
+    def drawwithcg(self, which='main', array=None, color=((255, 0, 0), (0, 255, 0)), thickness=1):
+        if array is not None:
+            array = array.reshape((-1, 1, 2))
+            array = np.array(np.rint(array), dtype='int32')
+            steps = len(array)-1
+            cm = Col_man()
+            cg = cm.color_gradient(start=color[0], stop=color[1], rateofcahnge=((color[1][0]-color[0][0])/steps, (color[1][1]-color[0][1])/steps, (color[1][2]-color[0][2])/steps), steps=steps)
+            if which == 'main':
+                for i in range(len(array)-1):
+                    self.canvas.main = cv2.polylines(self.canvas.main, [array[i:i+2]], False, cg.__next__(), thickness)
+            elif which == 'clone':
+                for i in range(len(array)-1):
+                    self.canvas.clone = cv2.polylines(self.canvas.clone, [array[i:i+2]], False, cg.__next__(), thickness)
+            else:
+                NameError(f'{which} not available')
+        else:
+            RuntimeError('please specify array of points')
+
     def drawaxis(self, which='main', color=(200, 200, 0), lw=2):
         if which == 'main' or which == 'clone':
             self.drawit(which=which, array=self.truepos([min(self.bv1bound), max(self.bv1bound)], [0, 0]),
@@ -99,7 +119,7 @@ class carsys2D:  # full form is cartesian System 2 dimensional
         else:
             NameError(f'{which} not found')
 
-    def drawgrid(self, skip_factor=(1, 1), which='main', color=(200, 200, 200), lw=1):
+    def drawgrid(self, skip_factor=(5, 5), which='main', color=(200, 200, 200), lw=1):
         if which == 'main' or which == 'clone':
             val = np.array([0, 0])
             updw = [min(self.bv2bound), max(self.bv2bound)]
