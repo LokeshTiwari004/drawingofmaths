@@ -1,11 +1,13 @@
 import cv2
 import numpy as np
 
+# (-np.pi/6, np.pi/2, np.pi/6)
+
 
 # this class gives us a cartesian 2-dimensional system
 class carsys3D:  # full form is cartesian System 2 dimensional
 
-    def __init__(self, canvas, center=None, bvscalings=(10, 10, 10), bvangles=(-np.pi/6, np.pi/2, np.pi/6), bvbounds=(range(-40, 41), range(-42, 43), range(-40, 41))):
+    def __init__(self, canvas, center=None, bvscalings=(10, 10, 10), bvangles=(np.arccos(1/(3**0.5)), np.arccos(1/(3**0.5)), np.arccos(1/(3**0.5))), bvbounds=(range(-40, 41), range(-42, 43), range(-40, 41))):
         self.canvas = canvas
 
         # this provides the center aka origin for system 2 dimensional
@@ -18,20 +20,51 @@ class carsys3D:  # full form is cartesian System 2 dimensional
                 RuntimeError('center must be "list" of two real numbers')
 
         # these are the default orthogonal basis vectors
-        self.xangle = bvangles[0]
-        self.yangle = bvangles[1]
-        self.zangle = bvangles[2]
+        self.alpha = bvangles[0]
+        self.beta = bvangles[1]
+        self.gamma = bvangles[2]
+
+        self.a = np.cos(self.alpha)
+        self.b = np.cos(self.beta)
+        self.c = np.cos(self.gamma)
+
+        self.theta = np.arccos(-(self.a * self.b) / np.sqrt((self.c ** 2 + self.b ** 2) * (self.c ** 2 + self.a ** 2)))
+        self.phi = np.arccos(-(self.b * self.c) / np.sqrt((self.b ** 2 + self.a ** 2) * (self.a ** 2 + self.c ** 2)))
+
+        self.axial_angle = 0
 
         self.scaling = bvscalings
 
-        self.bv1 = np.array([self.scaling[0] * np.cos(self.xangle), -self.scaling[0] * np.sin(self.xangle)])
-        self.bv2 = np.array([self.scaling[1] * np.cos(self.yangle), -self.scaling[1] * np.sin(self.yangle)])
-        self.bv3 = np.array([self.scaling[2] * np.cos(self.zangle), -self.scaling[2] * np.sin(self.zangle)])
+        self.bv1 = self.scaling[0] * np.sin(self.alpha) * np.array([np.cos(np.pi/2 - self.theta + self.axial_angle), - np.sin(np.pi/2 - self.theta + self.axial_angle)])
+        self.bv2 = self.scaling[1] * np.sin(self.beta) * np.array([np.cos(np.pi/2 + self.axial_angle), - np.sin(np.pi/2 + self.axial_angle)])
+        self.bv3 = self.scaling[2] * np.sin(self.gamma) * np.array([np.cos(np.pi/2 + self.phi + self.axial_angle), - np.sin(np.pi/2 + self.phi + self.axial_angle)])
 
         # boundary is the extreme value that one can take in the direction of the basis vectors
         self.bv1bound = bvbounds[0]
         self.bv2bound = bvbounds[1]
         self.bv3bound = bvbounds[2]
+
+    def rotate(self, alpha, beta, gamma, axial_angle=0):
+        self.alpha = alpha
+        self.beta = beta
+        self.gamma = gamma
+        self.axial_angle = axial_angle
+
+        self.a = np.cos(self.alpha)
+        self.b = np.cos(self.beta)
+        self.c = np.cos(self.gamma)
+
+        self.theta = np.sign(self.c) * np.arccos(- (self.a * self.b) / np.sqrt((self.c ** 2 + self.b ** 2) * (self.c ** 2 + self.a ** 2)))
+        self.phi = np.sign(self.a) * np.arccos(- (self.b * self.c) / np.sqrt((self.b ** 2 + self.a ** 2) * (self.a ** 2 + self.c ** 2)))
+
+        self.bv1 = self.scaling[0] * np.sin(self.alpha) * np.array([np.cos(np.pi/2 - self.theta + self.axial_angle), - np.sin(np.pi/2 - self.theta + self.axial_angle)])
+        self.bv2 = self.scaling[1] * np.sin(self.beta) * np.array([np.cos(np.pi/2 + self.axial_angle), - np.sin(np.pi/2 + self.axial_angle)])
+        self.bv3 = self.scaling[2] * np.sin(self.gamma) * np.array([np.cos(np.pi/2 + self.phi + self.axial_angle), - np.sin(np.pi/2 + self.phi + self.axial_angle)])
+
+    def rescale(self, x_scale, y_scale, z_scale):
+        self.bv1bound = x_scale
+        self.bv2bound = y_scale
+        self.bv3bound = z_scale
 
     def truepos(self, x=None, y=None, z=None, bind=False):  # full form of this function name is true position
 

@@ -45,8 +45,20 @@ class DrawSphere:
 
 if __name__ == '__main__':
     screen = Canvas()
-    sys3d = carsys3D(screen, bvbounds=(range(-30, 31), range(-30, 0), range(-35, 36)))
+    sys3d = carsys3D(screen, bvbounds=(range(-60, 101), range(-80, 81), range(-60, 101)))
 
-    DrawSphere(sys3d, steps=100).drawit(along_y=True, bound=True, lw=1)
+    r = np.arccos(1/(3**0.5))
+    sys3d.rotate(np.pi + r, r, r)
+
+    # print(sys3d.theta)
+    # print(sys3d.phi)
+    #
+    # print(sys3d.bv1)
+    # print(sys3d.bv2)
+    # print(sys3d.bv3)
+
+    sys3d.drawaxis()
+
+    DrawSphere(sys3d, steps=100).drawit(along_y=True, bound=False, lw=1)
 
     screen.savesc('sphere1.png')
