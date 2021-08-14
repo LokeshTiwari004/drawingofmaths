@@ -1,7 +1,7 @@
 from base.dom import *
 
 fh = Handle_frames()
-mm = MovieMaker(fh.frame_seq_path, 'eleventh', framerate=30)
+mm = MovieMaker(fh.frame_seq_path, 'eleventh')
 
 sc = Canvas()
 win = carsys2D(canvas=sc)

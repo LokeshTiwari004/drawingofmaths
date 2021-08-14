@@ -5,7 +5,7 @@ import pathlib
 
 class Handle_frames:
 
-    def __init__(self, name='anim', scene=1, padding_digits=6, img_format='.png'):
+    def __init__(self, name='img_sequence', scene=1, padding_digits=6, img_format='.png'):
         self.img_format = img_format
         self.name = name
         self.scene = str(scene)

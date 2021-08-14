@@ -19,6 +19,15 @@ class Canvas:
     def clonesc(self):
         self.clone = self.main.copy()
 
+    def write(self, material, where, which='main', color=(255, 255, 255), fontScale=2, thickness=2, bottomLeftOrigin=False):
+        if which == 'main':
+            cv2.putText(self.main, material, where, fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=fontScale, color=color, thickness=thickness, bottomLeftOrigin=bottomLeftOrigin)
+        elif which == 'clone':
+            cv2.putText(self.clone, material, where, fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=fontScale, color=color,
+                        thickness=thickness, bottomLeftOrigin=bottomLeftOrigin)
+        else:
+            RuntimeError(f'{which} is not available')
+
     # this gives you a checkpoint of the clone (exclusive)or main
     def createcp(self, which="main"):
         if which == 'clone':

@@ -6,7 +6,7 @@ from base.colormanager import Col_man
 # this class gives us a cartesian 2-dimensional system
 class carsys2D:  # full form is cartesian System 2 dimensional
 
-    def __init__(self, canvas, center=None):
+    def __init__(self, canvas, center=None, bvscalings=(10, 10), bvangles=(0, np.pi/2), bvbounds=(range(-98, 99), range(-53, 54))):
         self.canvas = canvas
 
         # this provides the center aka origin for system 2 dimensional
@@ -19,12 +19,14 @@ class carsys2D:  # full form is cartesian System 2 dimensional
                 RuntimeError('center must be "list" of two real numbers')
 
         # these are the default orthogonal basis vectors
-        self.bv1 = np.array([10, 0])
-        self.bv2 = np.array([0, -10])
+        self.bv1 = np.array([bvscalings[0] * np.cos(bvangles[0]), -bvscalings[0] * np.sin(bvangles[0])])
+        self.bv2 = np.array([bvscalings[1] * np.cos(bvangles[1]), -bvscalings[1] * np.sin(bvangles[1])])
 
         # boundary is the extreme value that one can in the direction of the basis vectors
-        self.bv1bound = range(-98, 99)
-        self.bv2bound = range(-53, 54)
+        self.bv1bound = bvbounds[0]
+        self.bv2bound = bvbounds[1]
+
+        self.label = 'XY'
 
     def truepos(self, arr, y=None, bindit=False):  # full form of this function name is true position
 
@@ -92,7 +94,7 @@ class carsys2D:  # full form is cartesian System 2 dimensional
         else:
             RuntimeError('please specify array of points')
 
-    def drawwithcg(self, which='main', array=None, color=((255, 0, 0), (0, 255, 0)), thickness=1):
+    def drawwithcg(self, which='main', array=None, color=((200, 100, 50), (100, 200, 50)), thickness=1):
         if array is not None:
             array = array.reshape((-1, 1, 2))
             array = np.array(np.rint(array), dtype='int32')
@@ -110,12 +112,17 @@ class carsys2D:  # full form is cartesian System 2 dimensional
         else:
             RuntimeError('please specify array of points')
 
-    def drawaxis(self, which='main', color=(200, 200, 0), lw=2):
+    def drawaxis(self, which='main', labelit=True, color=(200, 200, 0), lw=2):
         if which == 'main' or which == 'clone':
             self.drawit(which=which, array=self.truepos([min(self.bv1bound), max(self.bv1bound)], [0, 0]),
                         color=color, thickness=lw)
             self.drawit(which=which, array=self.truepos([0, 0], [min(self.bv2bound), max(self.bv2bound)]),
                         color=color, thickness=lw)
+            if labelit:
+                pos = self.truepos([max(self.bv1bound)+1], [0])[0]
+                self.canvas.write(self.label[0], [int(pos[0]), int(pos[1])], which)
+                pos = self.truepos([0], [max(self.bv2bound) + 1])[0]
+                self.canvas.write(self.label[1], [int(pos[0]), int(pos[1])], which)
         else:
             NameError(f'{which} not found')
 

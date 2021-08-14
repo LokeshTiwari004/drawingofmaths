@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from base.colormanager import Col_man
 
 # (-np.pi/6, np.pi/2, np.pi/6)
 
@@ -43,6 +44,8 @@ class carsys3D:  # full form is cartesian System 2 dimensional
         self.bv1bound = bvbounds[0]
         self.bv2bound = bvbounds[1]
         self.bv3bound = bvbounds[2]
+
+        self.label = 'XYZ'
 
     def rotate(self, alpha, beta, gamma, axial_angle=0):
         self.alpha = alpha
@@ -115,21 +118,48 @@ class carsys3D:  # full form is cartesian System 2 dimensional
         else:
             RuntimeError('please specify array of points')
 
-    def drawaxis(self, which='main', x=True, y=True, z=True, xc=(200, 200, 0), yc=(200, 200, 0), zc=(200, 200, 0), lw=2):
+    def drawwithcg(self, which='main', array=None, color=((200, 100, 50), (100, 200, 50)), thickness=1):
+        if array is not None:
+            array = array.reshape((-1, 1, 2))
+            array = np.array(np.rint(array), dtype='int32')
+            steps = len(array)-1
+            cm = Col_man()
+            cg = cm.color_gradient(start=color[0], stop=color[1], rateofcahnge=((color[1][0]-color[0][0])/steps, (color[1][1]-color[0][1])/steps, (color[1][2]-color[0][2])/steps), steps=steps)
+            if which == 'main':
+                for i in range(len(array)-1):
+                    self.canvas.main = cv2.polylines(self.canvas.main, [array[i:i+2]], False, cg.__next__(), thickness)
+            elif which == 'clone':
+                for i in range(len(array)-1):
+                    self.canvas.clone = cv2.polylines(self.canvas.clone, [array[i:i+2]], False, cg.__next__(), thickness)
+            else:
+                NameError(f'{which} not available')
+        else:
+            RuntimeError('please specify array of points')
+
+    def drawaxis(self, which='main', x=True, y=True, z=True, labelit=True, xc=(200, 200, 200), yc=(200, 200, 200), zc=(200, 200, 200), lw=2):
         if which == 'main' or which == 'clone':
             if x:
                 self.drawit(which=which, array=self.truepos(np.array([min(self.bv1bound), max(self.bv1bound)]), np.array([0, 0]), np.array([0, 0])),
                             color=xc, thickness=lw)
+                if labelit:
+                    pos = self.truepos([max(self.bv1bound)+1], [0], [0])[0]
+                    self.canvas.write(self.label[0], [int(pos[0]), int(pos[1])], which)
             if y:
                 self.drawit(which=which, array=self.truepos(np.array([0, 0]), np.array([min(self.bv2bound), max(self.bv2bound)]), np.array([0, 0])),
                             color=yc, thickness=lw)
+                if labelit:
+                    pos = self.truepos([0], [max(self.bv2bound)+1], [0])[0]
+                    self.canvas.write(self.label[1], [int(pos[0]), int(pos[1])], which)
             if z:
                 self.drawit(which=which, array=self.truepos(np.array([0, 0]), np.array([0, 0]), np.array([min(self.bv3bound), max(self.bv3bound)])),
                             color=zc, thickness=lw)
+                if labelit:
+                    pos = self.truepos([0], [0], [max(self.bv3bound)+1])[0]
+                    self.canvas.write(self.label[2], [int(pos[0]), int(pos[1])], which)
         else:
             NameError(f'{which} not found')
 
-    def drawgrid(self, which='main', skip_factor=(4, 4, 4), xy=True, yz=True, zx=True, xyc=(100, 100, 100), yzc=(100, 100, 100), zxc=(100, 100, 100), lw=1):
+    def drawgrid(self, which='main', skip_factor=(4, 4, 4), xy=True, yz=True, zx=True, xyc=(150, 100, 50), yzc=(150, 100, 50), zxc=(150, 100, 50), lw=1):
         val = np.array([0, 0])
 
         updw = np.array([min(self.bv2bound), max(self.bv2bound)])
