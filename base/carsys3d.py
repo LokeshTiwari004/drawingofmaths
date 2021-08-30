@@ -13,7 +13,7 @@ class carsys3D:  # full form is cartesian System 2 dimensional
 
         # this provides the center aka origin for system 2 dimensional
         if center is None:
-            self.center = np.array([self.canvas.width / 2, self.canvas.height / 2])
+            self.center = np.array([self.canvas.width / 2, self.canvas.height / 2], dtype='float64')
         else:
             if type(center) is list:
                 self.center = np.array(center)
