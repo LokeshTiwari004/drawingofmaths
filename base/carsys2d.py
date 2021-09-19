@@ -94,7 +94,7 @@ class carsys2D:  # full form is cartesian System 2 dimensional
         else:
             RuntimeError('please specify array of points')
 
-    def drawwithcg(self, which='main', array=None, color=((200, 100, 50), (100, 200, 50)), thickness=1):
+    def drawwithcg(self, which='main', array=None, color=((200, 100, 100), (100, 200, 100)), thickness=1):
         if array is not None:
             array = array.reshape((-1, 1, 2))
             array = np.array(np.rint(array), dtype='int32')
@@ -134,9 +134,14 @@ class carsys2D:  # full form is cartesian System 2 dimensional
             for g in range(0, int(max(self.bv1bound)), skip_factor[0]):
                 self.drawit(which=which, array=self.truepos(val + np.array([g, g]), updw), color=color,
                             thickness=lw)
-                self.drawit(which=which,array=self.truepos(val - np.array([g, g]), updw), color=color, thickness=lw)
+            for g in range(0, -int(min(self.bv1bound)), skip_factor[0]):
+                self.drawit(which=which,array=self.truepos(val - np.array([g, g]), updw), color=color,
+                            thickness=lw)
             for g in range(0, int(max(self.bv2bound)), skip_factor[1]):
-                self.drawit(which=which, array=self.truepos(lfrg, val + np.array([g, g])), color=color, thickness=lw)
-                self.drawit(which=which, array=self.truepos(lfrg, val - np.array([g, g])), color=color, thickness=lw)
+                self.drawit(which=which, array=self.truepos(lfrg, val + np.array([g, g])), color=color,
+                            thickness=lw)
+            for g in range(0, -int(min(self.bv2bound)), skip_factor[1]):
+                self.drawit(which=which, array=self.truepos(lfrg, val - np.array([g, g])), color=color,
+                            thickness=lw)
         else:
             NameError(f'{which} not found')

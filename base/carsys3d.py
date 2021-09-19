@@ -159,7 +159,7 @@ class carsys3D:  # full form is cartesian System 2 dimensional
         else:
             NameError(f'{which} not found')
 
-    def drawgrid(self, which='main', skip_factor=(4, 4, 4), xy=True, yz=True, zx=True, xyc=(150, 100, 50), yzc=(150, 100, 50), zxc=(150, 100, 50), lw=1):
+    def drawgrid(self, which='main', skip_factor=(5, 5, 5), xy=True, yz=True, zx=True, xyc=(87, 77, 52), yzc=(87, 77, 52), zxc=(87, 77, 52), lw=1):
         val = np.array([0, 0])
 
         updw = np.array([min(self.bv2bound), max(self.bv2bound)])
