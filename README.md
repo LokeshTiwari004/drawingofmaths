@@ -1,2 +1,2 @@
 # drawingofmaths
-This is a visualization library meant for education, fun and research.
+This is a visualization library meant for education and fun.
